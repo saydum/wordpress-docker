@@ -4,6 +4,7 @@ services:
   # MySQL
   mysql:
     image: mysql:8-debian
+    container_name: mysql
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
@@ -16,6 +17,7 @@ services:
   # WordPress
   wordpress:
     image: wordpress:php8.1-fpm
+    container_name: wp
     volumes:
       - ./www:/var/www/html
     depends_on:
@@ -34,6 +36,7 @@ services:
   # Nginx
   nginx:
     image: nginx:latest
+    container_name: nginx
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./www:/var/www/html
