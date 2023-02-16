@@ -1,18 +1,22 @@
-version: '3'
+version: '3.9'
+
 services:
   
   # MySQL
   mysql:
-    image: mysql:8-debian
+    image: mysql/mysql-server:8.0
     container_name: mysql
+    ports:
+      - 3306:3306
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: db_wordpress
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-    restart: always
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_PASSWORD=password
+      - MYSQL_USER=root
+      - MYSQL_DATABASE=wp_db
+    networks:
+      - wordpress
   
   # WordPress
   wordpress:
@@ -23,15 +27,17 @@ services:
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_HOST: mysql:3306
       MYSQL_ROOT_PASSWORD: password
-      WORDPRESS_DB_NAME: db_wordpress
+      WORDPRESS_DB_NAME: wp_db
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: password
       WORDPRESS_TABLE_PREFIX: wp_
     links:
       - mysql
     restart: always
+    networks:
+      - wordpress
   
   # Nginx
   nginx:
@@ -42,5 +48,13 @@ services:
       - ./www:/var/www/html
     ports:
       - 8080:80
-    links:
+    depends_on:
+      - mysql
       - wordpress
+    networks:
+      - wordpress
+
+networks:
+  wordpress:
+volumes:
+  mysql:
